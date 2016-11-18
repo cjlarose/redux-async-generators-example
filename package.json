@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "author": "AppFolio <dev@appfolio.com>",
   "license": "MIT",
+  "scripts": {
+    "build": "babel --out-dir out src"
+  },
   "devDependencies": {
     "eslint": "^3.10.2",
     "eslint-config-airbnb-base": "^10.0.1",
