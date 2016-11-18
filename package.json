@@ -7,5 +7,8 @@
     "eslint": "^3.10.2",
     "eslint-config-airbnb-base": "^10.0.1",
     "eslint-plugin-import": "^2.2.0"
+  },
+  "dependencies": {
+    "babel-cli": "^6.18.0"
   }
 }
