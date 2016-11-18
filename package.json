@@ -2,5 +2,10 @@
   "name": "redux-async-generators-example",
   "version": "1.0.0",
   "author": "AppFolio <dev@appfolio.com>",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "eslint": "^3.10.2",
+    "eslint-config-airbnb-base": "^10.0.1",
+    "eslint-plugin-import": "^2.2.0"
+  }
 }
