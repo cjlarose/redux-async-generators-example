@@ -1,9 +1,23 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { createStore } from 'redux';
+import { createStore, applyMiddleware } from 'redux';
 import calculator from './reducers/calculator';
 
-const store = createStore(calculator);
+const asyncInteratorMiddleware = store => next => (action) => {
+  if (typeof action !== 'function') {
+    next(action);
+    return;
+  }
+
+  const iterator = action(store.getState);
+  (async function go() {
+    for await (const result of iterator) {
+      next(result);
+    }
+  }());
+};
+
+const store = createStore(calculator, applyMiddleware(asyncInteratorMiddleware));
 const rootEl = document.getElementById('root');
 
 function Calculator(props) {
@@ -26,18 +40,6 @@ Calculator.propTypes = {
   onBaseChange: React.PropTypes.func,
 };
 
-/*
-function startExponentiation(base, exponent) {
-  const calculateAction = {
-    type: 'RESULT_CALCULATED',
-    value: base ** exponent,
-  };
-  setTimeout(() => {
-    store.dispatch(calculateAction);
-  }, 1000);
-}
-*/
-
 function delayPromise(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
@@ -47,9 +49,13 @@ async function exponentiate(base, exponent) {
   return base ** exponent;
 }
 
-async function* startExponentiation(base, exponent) {
-  const result = await exponentiate(base, exponent);
-  yield { type: 'RESULT_CALCULATED', value: result };
+function startExponentiation(base, exponent) {
+  return async function* (getState) {
+    // console.log(getState());
+    yield { type: 'CALCULATION_STARTED' };
+    const result = await exponentiate(base, exponent);
+    yield { type: 'RESULT_CALCULATED', value: result };
+  };
 }
 
 function onBaseChange(e) {
@@ -57,7 +63,7 @@ function onBaseChange(e) {
   store.dispatch({ type: 'BASE_CHANGED', value: newBase });
 
   const { exponent } = store.getState();
-  startExponentiation(newBase, exponent);
+  store.dispatch(startExponentiation(newBase, exponent));
 }
 
 function onExponentChange(e) {
@@ -65,7 +71,7 @@ function onExponentChange(e) {
   store.dispatch({ type: 'EXPONENT_CHANGED', value: newExponent });
 
   const { base } = store.getState();
-  startExponentiation(base, newExponent);
+  store.dispatch(startExponentiation(base, newExponent));
 }
 
 function render() {
