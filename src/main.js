@@ -25,16 +25,29 @@ Calculator.propTypes = {
   onBaseChange: React.PropTypes.func,
 };
 
-function onInputChange(key, e) {
-  const action = {
-    type: `${key}_CHANGED`,
-    value: parseInt(e.target.value, 10),
+function exponentiate(base, exponent) {
+  const calculateAction = {
+    type: 'RESULT_CALCULATED',
+    value: base ** exponent,
   };
-  store.dispatch(action);
+  store.dispatch(calculateAction);
 }
 
-const onBaseChange = onInputChange.bind(null, 'BASE');
-const onExponentChange = onInputChange.bind(null, 'EXPONENT');
+function onBaseChange(e) {
+  const newBase = parseInt(e.target.value, 10);
+  store.dispatch({ type: 'BASE_CHANGED', value: newBase });
+
+  const { exponent } = store.getState();
+  exponentiate(newBase, exponent);
+}
+
+function onExponentChange(e) {
+  const newExponent = parseInt(e.target.value, 10);
+  store.dispatch({ type: 'EXPONENT_CHANGED', value: newExponent });
+
+  const { base } = store.getState();
+  exponentiate(base, newExponent);
+}
 
 function render() {
   const { result, base, exponent } = store.getState();
