@@ -12,7 +12,7 @@ function Calculator(props) {
     <input type="number" value={props.base} onChange={props.onBaseChange} />
     <input type="number" value={props.exponent} onChange={props.onExponentChange} />
     <span className="result">
-      {props.result}
+      { props.calculating ? 'CALCULATING' : props.result }
     </span>
   </div>);
 }
@@ -21,6 +21,7 @@ Calculator.propTypes = {
   base: React.PropTypes.number,
   exponent: React.PropTypes.number,
   result: React.PropTypes.number,
+  calculating: React.PropTypes.bool,
   onExponentChange: React.PropTypes.func,
   onBaseChange: React.PropTypes.func,
 };
@@ -30,7 +31,9 @@ function exponentiate(base, exponent) {
     type: 'RESULT_CALCULATED',
     value: base ** exponent,
   };
-  store.dispatch(calculateAction);
+  setTimeout(() => {
+    store.dispatch(calculateAction);
+  }, 1000);
 }
 
 function onBaseChange(e) {
@@ -50,12 +53,9 @@ function onExponentChange(e) {
 }
 
 function render() {
-  const { result, base, exponent } = store.getState();
   ReactDOM.render(
     <Calculator
-      base={base}
-      exponent={exponent}
-      result={result}
+      {...store.getState()}
       onBaseChange={onBaseChange}
       onExponentChange={onExponentChange}
     />,
