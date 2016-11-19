@@ -49,6 +49,13 @@ async function exponentiate(base, exponent) {
   return base ** exponent;
 }
 
+async function* watchIncrementAsync() {
+  while (true) {
+    const action = await sagaRunner.getNextAction('INCREMENT_ASYNC');
+    dispatch(incrementAsync());
+  }
+}
+
 function startExponentiation(base, exponent) {
   return async function* (getState) {
     // console.log(getState());
