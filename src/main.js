@@ -1,5 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import thunk from 'redux-thunk';
 import { createStore, applyMiddleware } from 'redux';
 import calculator from './reducers/calculator';
 
@@ -17,7 +18,8 @@ const asyncInteratorMiddleware = store => next => (action) => {
   }());
 };
 
-const store = createStore(calculator, applyMiddleware(asyncInteratorMiddleware));
+//const store = createStore(calculator, applyMiddleware(asyncInteratorMiddleware));
+const store = createStore(calculator, applyMiddleware(thunk));
 const rootEl = document.getElementById('root');
 
 function Calculator(props) {
@@ -49,12 +51,23 @@ async function exponentiate(base, exponent) {
   return base ** exponent;
 }
 
+/*
 function startExponentiation(base, exponent) {
   return async function* (getState) {
     // console.log(getState());
     yield { type: 'CALCULATION_STARTED' };
     const result = await exponentiate(base, exponent);
     yield { type: 'RESULT_CALCULATED', value: result };
+  };
+}
+*/
+
+function startExponentiation(base, exponent) {
+  return async function (dispatch, getState) {
+    // console.log(getState());
+    dispatch({ type: 'CALCULATION_STARTED' });
+    const result = await exponentiate(base, exponent);
+    dispatch({ type: 'RESULT_CALCULATED', value: result });
   };
 }
 
