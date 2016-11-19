@@ -26,7 +26,8 @@ Calculator.propTypes = {
   onBaseChange: React.PropTypes.func,
 };
 
-function exponentiate(base, exponent) {
+/*
+function startExponentiation(base, exponent) {
   const calculateAction = {
     type: 'RESULT_CALCULATED',
     value: base ** exponent,
@@ -35,13 +36,28 @@ function exponentiate(base, exponent) {
     store.dispatch(calculateAction);
   }, 1000);
 }
+*/
+
+function delayPromise(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+async function exponentiate(base, exponent) {
+  await delayPromise(1000);
+  return base ** exponent;
+}
+
+async function* startExponentiation(base, exponent) {
+  const result = await exponentiate(base, exponent);
+  yield { type: 'RESULT_CALCULATED', value: result };
+}
 
 function onBaseChange(e) {
   const newBase = parseInt(e.target.value, 10);
   store.dispatch({ type: 'BASE_CHANGED', value: newBase });
 
   const { exponent } = store.getState();
-  exponentiate(newBase, exponent);
+  startExponentiation(newBase, exponent);
 }
 
 function onExponentChange(e) {
@@ -49,7 +65,7 @@ function onExponentChange(e) {
   store.dispatch({ type: 'EXPONENT_CHANGED', value: newExponent });
 
   const { base } = store.getState();
-  exponentiate(base, newExponent);
+  startExponentiation(base, newExponent);
 }
 
 function render() {
